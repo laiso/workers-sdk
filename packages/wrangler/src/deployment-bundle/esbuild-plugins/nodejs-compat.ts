@@ -53,6 +53,65 @@ export const nodejsCompatPlugin: (silenceWarnings: boolean) => Plugin = (
 				return result;
 			}
 		);
+		/**
+		 * TODO:  https://github.com/denoland/deno-astro-adapter/blob/9418fa6306204cfbfc96905b2248ee59a511560b/src/index.ts#L107
+		 */
+		const COMPATIBLE_NODE_MODULES = [
+			'assert',
+			'assert/strict',
+			'async_hooks',
+			'buffer',
+			'child_process',
+			'cluster',
+			'console',
+			'constants',
+			'crypto',
+			'dgram',
+			'diagnostics_channel',
+			'dns',
+			'events',
+			'fs',
+			'fs/promises',
+			'http',
+			// 'http2',
+			'https',
+			'inspector',
+			'module',
+			'net',
+			'os',
+			'path',
+			'path/posix',
+			'path/win32',
+			'perf_hooks',
+			'process',
+			'punycode',
+			'querystring',
+			'readline',
+			'repl',
+			'stream',
+			'stream/promises',
+			'stream/web',
+			'string_decoder',
+			'sys',
+			'timers',
+			'timers/promises',
+			// 'tls',
+			'trace_events',
+			'tty',
+			'tls',
+			'url',
+			'util',
+			'util/types',
+			// 'v8',
+			// 'vm',
+			// 'wasi',
+			// 'webcrypto',
+			'worker_threads',
+			'zlib',
+		];
+		const filter = new RegExp(COMPATIBLE_NODE_MODULES.map((mod) => `(^${mod}$)`).join('|'));
+		pluginBuild.onResolve({ filter }, (args) => ({ path: 'node:' + args.path, external: true }));
+
 		// Wait until the build finishes to log warnings, so that all files which import a package
 		// can be collated
 		pluginBuild.onEnd(() => {
